@@ -1,170 +1,202 @@
-.App {
-  text-align: center;
+/* GLOBAL STYLES */
+html, body {
+  margin: 0;
+  padding: 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  margin: 0;
+  overflow-x: hidden;
+  font-family: "Poppins", Arial, sans-serif;
+  background: #fdfaf5;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* HEADER */
+.header {
+  position:sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999; 
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  padding: 12px 20px;
+  background: #8baeeb;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
 }
 
-.App-link {
-  color: #61dafb;
+.logo {
+  width: 65px;
+  height: auto;
+  margin-right: 15px;
+  margin-left: 12px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-.container {
-  padding: 20px;
-  font-family: Arial, sans-serif;
+.brand-title h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #0a2f51;
 }
 
-.title {
-  text-align: center;
-  margin-bottom: 20px;
+.brand-title p {
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+  letter-spacing: 0.5px;
 }
 
-.cards {
+/* MAIN LAYOUT */
+.main-section {
   display: flex;
-  gap: 20px;
-  justify-content: center;
-  margin-bottom: 30px;
+  justify-content: space-evenly;
+  padding: 40px;
 }
 
-.card {
-  width: 150px;
-  padding: 15px;
+/* PRODUCT IMAGE BOX */
+.product-section {
   text-align: center;
-  border-radius: 10px;
-  background-color: #f3f3f3;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.product-image {
+  width: 380px;
+  border-radius: 15px;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.18);
+}
+
+.product-name {
+  margin-top: 15px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #000000;
+}
+
+/* SENSOR GRID SECTION */
+.sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 220px);
+  gap: 25px;
+  padding-top: 20px;
+}
+
+.sensor-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.10);
+  transition: transform 0.2s ease-in-out;
+}
+
+.sensor-card:hover {
+  transform: translateY(-4px);
+}
+
+.sensor-card h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #4a4a4a;
 }
 
 .value {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: bold;
-  margin-top: 5px;
+  margin-top: 6px;
+  color: #5f6164;
 }
 
-.feed-button {
-  display: block;
-  margin: 0 auto 30px;
-  padding: 10px 25px;
-  background-color: #0077ff;
+/* FEED NOW BUTTON */
+.feed-btn {
+  grid-column: span 2;
+  padding: 14px;
+  font-size: 18px;
+  background: #5f6164;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: 0.2s;
 }
 
-.feed-button:hover {
-  background-color: #005fcc;
+.feed-btn:hover {
+  background: #0a2f51;
+  transform: scale(1.03);
 }
 
-.schedule-box {
-  text-align: center;
+/* MOBILE RESPONSIVE */
+@media (max-width: 900px) {
+  .main-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sensor-grid {
+    grid-template-columns: repeat(2, 160px);
+  }
+
+  .product-image {
+    width: 260px;
+  }
 }
 
-.schedule-box ul {
-  list-style: none;
-  padding: 0;
+@media (max-width: 600px) {
+  .sensor-grid {
+    grid-template-columns: repeat(1, 230px);
+  }
 }
-
-.schedule-box li {
-  padding: 8px;
-  background-color: #eaeaea;
-  margin: 5px auto;
-  width: 120px;
-  border-radius: 6px;
-}
-
-.schedule-form {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.schedule-input {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-.schedule-add-btn {
-  padding: 6px 14px;
-  border-radius: 6px;
-  border: none;
-  background-color: #0077ff;
-  color: #fff;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.schedule-add-btn:hover {
-  background-color: #005fcc;
-}
-
-.schedule-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.schedule-item {
+.modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
-  margin: 6px auto;
-  width: 160px;
-  background-color: #eaeaea;
-  padding: 6px 10px;
-  border-radius: 6px;
+  z-index: 2000;
 }
 
-.schedule-time {
-  flex: 1;
+.modal-box {
+  width: 480px;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.graph-title {
   text-align: center;
+  margin-bottom: 15px;
 }
 
-.schedule-delete-btn {
+.range-select-container {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.close-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #ff5555;
   border: none;
-  background: #ff4d4d;
+  border-radius: 8px;
   color: white;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
   cursor: pointer;
-  font-size: 12px;
-  line-height: 22px;
-  padding: 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.schedule-delete-btn:hover {
-  background: #e63939;
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: #777;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
 }

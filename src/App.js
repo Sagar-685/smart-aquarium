@@ -1,148 +1,120 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import ModalGraph from "./components/ModalGraph";
 import "./App.css";
 
 const API_BASE = "http://localhost:5000";
 
 function App() {
-  const [temperature, setTemperature] = useState("Loading...");
-  const [ph, setPh] = useState("Loading...");
-  const [schedules, setSchedules] = useState([]);
-  const [newTime, setNewTime] = useState("");
+  const [temperature, setTemperature] = useState("—");
+  const [humidity, setHumidity] = useState("—");
+  const [tds, setTds] = useState("—");
+  const [ultrasonic, setUltrasonic] = useState("—");
+  const [servoStatus, setServoStatus] = useState("Idle");
 
-  // -------- Sensor data --------
+  const [activeSensor, setActiveSensor] = useState(null);
+
+  // GET LATEST SENSOR DATA
   const fetchSensorData = async () => {
-    try {
-      const res = await axios.get(`${API_BASE}/api/sensor/latest`);
-      if (res.data) {
-        setTemperature(res.data.temperature.toFixed(2));
-        setPh(res.data.ph.toFixed(2));
-      }
-    } catch (err) {
-      console.error("Error fetching sensor data:", err.message);
-    }
-  };
+  try {
+    const res = await axios.get(`${API_BASE}/api/sensor/latest`);
+    const d = res.data;
 
-  // -------- Schedule data --------
-  const fetchSchedules = async () => {
-    try {
-      const res = await axios.get(`${API_BASE}/api/schedule/all`);
-      setSchedules(res.data || []);
-    } catch (err) {
-      console.error("Error fetching schedules:", err.message);
-    }
-  };
+    if (!d) return;
 
-  // Add new schedule
-  const handleAddSchedule = async (e) => {
-    e.preventDefault();
-    if (!newTime) return;
+    setTemperature(d.temperature !== null ? Number(d.temperature).toFixed(2) : "—");
+    setHumidity(d.humidity !== null ? Number(d.humidity).toFixed(2) : "—");
+    setTds(d.tds !== null ? Number(d.tds).toFixed(2) : "—");
+    setUltrasonic(d.ultrasonic !== null ? Number(d.ultrasonic).toFixed(2) : "—");
 
-    try {
-      const res = await axios.post(`${API_BASE}/api/schedule/add`, {
-        time: newTime, // "HH:MM" from input[type=time]
-      });
-      setSchedules((prev) => [...prev, res.data.schedule]);
-      setNewTime("");
-    } catch (err) {
-      console.error("Error adding schedule:", err.message);
-    }
-  };
+    // Servo is a string → DO NOT convert to number
+    setServoStatus(d.servo || "Idle");
 
-  // Delete schedule
-  const handleDeleteSchedule = async (id) => {
-    try {
-      await axios.delete(`${API_BASE}/api/schedule/${id}`);
-      setSchedules((prev) => prev.filter((s) => s._id !== id));
-    } catch (err) {
-      console.error("Error deleting schedule:", err.message);
-    }
-  };
+  } catch (err) {
+    console.error("Fetch sensor error:", err.message);
+  }
+};
 
-  // Manual feed
+
+  // FEED NOW
   const handleFeedNow = async () => {
     try {
       await axios.post(`${API_BASE}/api/feed/trigger`);
-      alert("Feed command sent (simulated) 🐟");
+      setServoStatus("Feeding…");
+      setTimeout(() => setServoStatus("Idle"), 5000);
     } catch (err) {
-      console.error("Error triggering feed:", err.message);
+      console.error("Feed error:", err.message);
     }
   };
 
-  // Helper to show nice 12-hr format
-  const formatTime = (t) => {
-    if (!t) return "";
-    const [hStr, mStr] = t.split(":");
-    let h = parseInt(hStr, 10);
-    const suffix = h >= 12 ? "PM" : "AM";
-    if (h === 0) h = 12;
-    else if (h > 12) h -= 12;
-    return `${h.toString().padStart(2, "0")}:${mStr} ${suffix}`;
-  };
-
-  // Initial load + auto refresh sensors
   useEffect(() => {
     fetchSensorData();
-    fetchSchedules();
-
-    const interval = setInterval(fetchSensorData, 10000);
+    const interval = setInterval(fetchSensorData, 5000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="container">
-      <h1 className="title">Smart Aquarium Dashboard</h1>
+    <div className="app-container">
 
-      {/* Sensor Cards */}
-      <div className="cards">
-        <div className="card">
-          <h3>Temperature</h3>
-          <p className="value">{temperature} °C</p>
+      {/* HEADER */}
+      <header className="header">
+        <img src="/logo.jpg" alt="Nexten Logo" className="logo" />
+        <div className="brand-title">
+          <h1>Nexten</h1>
+          <p>Creators of HydroGuardian</p>
+        </div>
+      </header>
+
+      {/* MAIN SECTION */}
+      <div className="main-section">
+
+        {/* PRODUCT IMAGE */}
+        <div className="product-section">
+          <img src="/feeder.jpg" alt="HydroGuardian Feeder" className="product-image" />
+          <h2 className="product-name">HydroGuardian Smart Feeder</h2>
         </div>
 
-        <div className="card">
-          <h3>pH Level</h3>
-          <p className="value">{ph}</p>
-        </div>
-      </div>
+        {/* SENSOR GRID */}
+        <div className="sensor-grid">
 
-      {/* Feed Button */}
-      <button className="feed-button" onClick={handleFeedNow}>
-        Feed Now
-      </button>
+          <div className="sensor-card" onClick={() => setActiveSensor("temperature")}>
+            <h3>Temperature</h3>
+            <p className="value">{temperature} °C</p>
+          </div>
 
-      {/* Schedule Section */}
-      <div className="schedule-box">
-        <h2>Feeding Schedule</h2>
+          <div className="sensor-card" onClick={() => setActiveSensor("humidity")}>
+            <h3>Humidity</h3>
+            <p className="value">{humidity} %</p>
+          </div>
 
-        <form className="schedule-form" onSubmit={handleAddSchedule}>
-          <input
-            type="time"
-            className="schedule-input"
-            value={newTime}
-            onChange={(e) => setNewTime(e.target.value)}
-            required
-          />
-          <button type="submit" className="schedule-add-btn">
-            Add
+          <div className="sensor-card" onClick={() => setActiveSensor("tds")}>
+            <h3>TDS</h3>
+            <p className="value">{tds} ppm</p>
+          </div>
+
+          <div className="sensor-card" onClick={() => setActiveSensor("ultrasonic")}>
+            <h3>Ultrasonic</h3>
+            <p className="value">{ultrasonic} cm</p>
+          </div>
+
+          <div className="sensor-card" onClick={() => setActiveSensor("servo")}>
+            <h3>Servo Status</h3>
+            <p className="value">{servoStatus}</p>
+          </div>
+
+          <button className="feed-btn" onClick={handleFeedNow}>
+            Feed Now
           </button>
-        </form>
-
-        <ul className="schedule-list">
-          {schedules.length === 0 && <li>No schedules added yet.</li>}
-          {schedules.map((sch) => (
-            <li key={sch._id} className="schedule-item">
-              <span className="schedule-time">{formatTime(sch.time)}</span>
-              <button
-                className="schedule-delete-btn"
-                onClick={() => handleDeleteSchedule(sch._id)}
-              >
-                ✕
-              </button>
-            </li>
-          ))}
-        </ul>
+        </div>
       </div>
+
+      {/* MODAL GRAPH */}
+      {activeSensor && (
+        <ModalGraph 
+          sensor={activeSensor}
+          onClose={() => setActiveSensor(null)}
+        />
+      )}
     </div>
   );
 }
