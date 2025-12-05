@@ -1,5 +1,6 @@
 This repo holds backend server and front end of the project.
 3rd party server- ngrok.com
+
     +------------------+
          |   ESP32 Board    |
          | (Sensors + Servo)|
